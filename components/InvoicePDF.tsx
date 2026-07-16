@@ -305,7 +305,7 @@ export default function InvoicePDF({
               {!isPremium && (
                 <View style={styles.watermarkOverlay}>
                   <View style={styles.watermarkStamp}>
-                    <Text style={styles.watermarkText}>Versão gratuita — OrçamentoPro</Text>
+                    <Text style={styles.watermarkText}>Versão gratuita — Orçafácil</Text>
                   </View>
                 </View>
               )}
@@ -452,7 +452,7 @@ export default function InvoicePDF({
 
         {!isPremium && (
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Gerado gratuitamente com OrçamentoPRO</Text>
+            <Text style={styles.footerText}>Gerado gratuitamente com Orçafácil</Text>
           </View>
         )}
       </Page>

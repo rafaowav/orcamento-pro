@@ -206,7 +206,7 @@ export default function Home() {
                   <Sparkles size={18} className="text-white" />
                 </div>
                 <span className="text-sm font-semibold uppercase tracking-[0.15em] text-white/80">
-                  OrçamentoPRO
+                  Orçafácil
                 </span>
               </div>
               <h1 className="text-[34px] md:text-[42px] font-extrabold leading-[1.1] tracking-tight mt-1">

@@ -1,10 +1,10 @@
-# OrçamentoPro
+# Orçafácil
 
 Gerador de orçamentos em PDF, simples e rápido, pensado para usuários finais, prestadores de serviço, autônomos e pequenos negócios.
 
 ## Sobre o projeto
 
-O OrçamentoPro é uma aplicação web que permite preencher os dados de empresa, cliente e serviços, gerando um orçamento em PDF em tempo real.
+O Orçafácil é uma aplicação web que permite preencher os dados de empresa, cliente e serviços, gerando um orçamento em PDF em tempo real.
 
 A proposta do projeto é facilitar a criação de orçamentos profissionais, com uma interface simples e foco em rapidez de uso.
 
@@ -34,13 +34,13 @@ Este projeto foi desenvolvido com foco em portfólio e também como base para um
 Clone o repositório:
 
 ```bash
-git clone https://github.com/rafaowav/orcamento-pro
+git clone https://github.com/rafaowav/orcafacil
 ```
 
 Acesse a pasta do projeto:
 
 ```bash
-cd orcamento-pro
+cd orcafacil
 ```
 
 Instale as dependências:
