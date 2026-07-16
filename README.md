@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OrçamentoPro
 
-## Getting Started
+Gerador de orçamentos em PDF, simples e rápido, pensado para prestadores de serviço, autônomos e pequenos negócios.
 
-First, run the development server:
+## Sobre o projeto
+
+O OrçamentoPro é uma aplicação web que permite preencher os dados de empresa, cliente e serviços, gerando um orçamento em PDF em tempo real.
+
+A proposta do projeto é facilitar a criação de orçamentos profissionais, com uma interface simples e foco em rapidez de uso.
+
+## Funcionalidades
+
+- Geração de orçamento em PDF
+- Visualização em tempo real do documento
+- Preenchimento de dados da empresa e do cliente
+- Adição dinâmica de serviços
+- Estrutura preparada para versão gratuita com marca d’água
+- Estrutura preparada para versão premium sem marca d’água
+
+## Tecnologias utilizadas
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- `@react-pdf/renderer`
+
+## Objetivo
+
+Este projeto foi desenvolvido com foco em portfólio e também como base para um produto web real, com possibilidade de monetização futura através de versão premium e anúncios.
+
+## Como rodar o projeto
+
+Clone o repositório:
+
+```bash
+git clone https://github.com/rafaowav/orcamento-pro
+```
+
+Acesse a pasta do projeto:
+
+```bash
+cd orcamento-pro
+```
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Rode o projeto em ambiente local:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Depois, abra no navegador:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estrutura do projeto
 
-## Learn More
+```bash
+app/
+components/
+public/
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Melhorias futuras
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Integração com Stripe
+- Remoção automática de marca d’água para usuários premium
+- Sistema de autenticação
+- Histórico de orçamentos
+- Exportação com modelos diferentes
+- Inserção de anúncios para monetização da versão gratuita
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Status do projeto
 
-## Deploy on Vercel
+Em desenvolvimento.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Autor
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Rafael Elisei
+Desenvolvedor de Software
