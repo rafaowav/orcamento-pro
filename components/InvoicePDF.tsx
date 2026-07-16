@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 
 interface Servico {
   description: string;
@@ -34,6 +34,7 @@ interface InvoicePDFProps {
   cliente: ClienteData;
   servicos: Servico[];
   isPremium?: boolean;
+  logoUrl?: string;
   descontoPercent?: number;
   observacoes?: string;
   numeroPedido?: string;
@@ -68,6 +69,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
+  },
+  logoImage: {
+    width: 60,
+    height: 60,
+    objectFit: "contain",
   },
   logoText: {
     fontSize: 7,
@@ -286,6 +292,7 @@ export default function InvoicePDF({
   cliente,
   servicos,
   isPremium = false,
+  logoUrl,
   descontoPercent = 0,
   observacoes = "",
   numeroPedido = "",
@@ -305,7 +312,11 @@ export default function InvoicePDF({
         <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
             <View style={styles.logoBox}>
-              <Text style={styles.logoText}>LOGO</Text>
+              {isPremium && logoUrl ? (
+                <Image style={styles.logoImage} src={logoUrl} />
+              ) : (
+                <Text style={styles.logoText}>LOGO</Text>
+              )}
               {!isPremium && (
                 <View style={styles.watermarkOverlay}>
                   <View style={styles.watermarkStamp}>

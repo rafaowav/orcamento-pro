@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Briefcase,
   User,
@@ -11,6 +11,9 @@ import {
   Sparkles,
   ArrowRight,
   Trash2,
+  Crown,
+  Upload,
+  Check,
 } from "lucide-react";
 import InvoicePDF from "@/components/InvoicePDF";
 import PdfDownloadButton from "@/components/PdfDownloadButton";
@@ -143,6 +146,82 @@ export default function Home() {
   const [dataPedido, setDataPedido] = useState(
     new Date().toLocaleDateString("pt-BR")
   );
+  const [isPremium, setIsPremium] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("");
+  const [loadingPremium, setLoadingPremium] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Verify premium against Stripe on mount
+  const verifySession = useCallback(async (sid: string) => {
+    try {
+      const res = await fetch(`/api/verify-session?session_id=${sid}`);
+      const data = await res.json();
+      if (data.premium) {
+        setIsPremium(true);
+        localStorage.setItem("orcafacil_sid", sid);
+        return true;
+      }
+    } catch {}
+    return false;
+  }, []);
+
+  useEffect(() => {
+    const storedSid = localStorage.getItem("orcafacil_sid");
+    if (storedSid) {
+      setSessionId(storedSid);
+      verifySession(storedSid);
+    }
+    const storedLogo = localStorage.getItem("orcafacil_logo");
+    if (storedLogo) {
+      setLogoUrl(storedLogo);
+    }
+  }, [verifySession]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("premium") === "success" && params.get("session_id")) {
+      const sid = params.get("session_id")!;
+      verifySession(sid).then((ok) => {
+        if (ok) setSessionId(sid);
+      });
+      window.history.replaceState({}, "", "/");
+    }
+  }, [verifySession]);
+
+  useEffect(() => {
+    if (logoUrl) {
+      localStorage.setItem("orcafacil_logo", logoUrl);
+    }
+  }, [logoUrl]);
+
+  function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setLogoUrl(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handlePremiumCheckout() {
+    setLoadingPremium(true);
+    fetch("/api/create-checkout-session", { method: "POST" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.error || "Erro ao iniciar pagamento");
+          setLoadingPremium(false);
+        }
+      })
+      .catch(() => {
+        alert("Erro ao conectar com Stripe");
+        setLoadingPremium(false);
+      });
+  }
 
   function updateEmpresa(field: string, value: string) {
     setEmpresa((prev) => ({ ...prev, [field]: value }));
@@ -175,7 +254,8 @@ export default function Home() {
     empresa,
     cliente,
     servicos,
-    isPremium: false,
+    isPremium,
+    logoUrl,
     descontoPercent,
     observacoes,
     numeroPedido,
@@ -407,6 +487,100 @@ export default function Home() {
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
             />
+          </SectionCard>
+
+          {/* Premium */}
+          <SectionCard>
+            <SectionHeader icon={Crown} title={isPremium ? "Premium Ativo" : "Seja Premium"} />
+            {isPremium ? (
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3 bg-gradient-to-br from-[#f59e0b]/10 to-[#f59e0b]/5 rounded-xl px-5 py-4 border border-[#f59e0b]/20">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f59e0b] to-[#d97706] flex items-center justify-center shadow-sm">
+                    <Crown size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#111827]">Conta Premium</p>
+                    <p className="text-xs text-[#6b7280]">Sem marca d'água nos PDFs</p>
+                  </div>
+                  <div className="ml-auto flex items-center gap-1.5 text-[#059669] text-xs font-bold">
+                    <Check size={14} /> Ativo
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label>Logo da Empresa</Label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                  />
+                  <div className="flex items-center gap-3">
+                    {logoUrl ? (
+                      <div className="w-16 h-16 rounded-xl border border-[#d1d5db] overflow-hidden flex items-center justify-center bg-white">
+                        <img src={logoUrl} alt="Logo" className="max-w-full max-h-full object-contain" />
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-xl border border-dashed border-[#d1d5db] flex items-center justify-center bg-[#f9fafb]">
+                        <Upload size={18} className="text-[#9ca3af]" />
+                      </div>
+                    )}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="h-10 px-5 rounded-xl bg-[#0058be]/10 text-[#0058be] text-xs font-bold uppercase tracking-wider hover:bg-[#0058be]/20 transition-all active:scale-95"
+                    >
+                      {logoUrl ? "Trocar Logo" : "Upload Logo"}
+                    </button>
+                    {logoUrl && (
+                      <button
+                        onClick={() => { setLogoUrl(""); localStorage.removeItem("orcafacil_logo"); }}
+                        className="h-10 px-4 rounded-xl text-[#ef4444] text-xs font-bold hover:bg-red-50 transition-all active:scale-95"
+                      >
+                        Remover
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <p className="text-xs text-[#6b7280] leading-relaxed">
+                  Remova a marca d'água dos PDFs e adicione o logo da sua empresa por apenas <strong className="text-[#111827]">R$ 9,90</strong> (pagamento único).
+                </p>
+                <button
+                  onClick={handlePremiumCheckout}
+                  disabled={loadingPremium}
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white text-sm font-bold uppercase tracking-wider shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loadingPremium ? (
+                    <span>Carregando...</span>
+                  ) : (
+                    <>
+                      <Crown size={16} /> Assinar Premium — R$ 9,90
+                    </>
+                  )}
+                </button>
+                <details className="group">
+                  <summary className="text-[11px] text-[#9ca3af] cursor-pointer hover:text-[#6b7280] transition-colors select-none">
+                    Já é premium? Restaurar acesso
+                  </summary>
+                  <div className="flex gap-2 mt-3">
+                    <Input
+                      placeholder="Cole seu session_id aqui"
+                      value={sessionId}
+                      onChange={(e) => setSessionId(e.target.value)}
+                    />
+                    <button
+                      onClick={() => verifySession(sessionId)}
+                      disabled={!sessionId}
+                      className="h-12 px-5 rounded-xl bg-[#0058be] text-white text-xs font-bold hover:bg-[#004a9e] transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shrink-0"
+                    >
+                      Restaurar
+                    </button>
+                  </div>
+                </details>
+              </div>
+            )}
           </SectionCard>
 
           {/* Discount + Summary */}
