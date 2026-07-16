@@ -69,20 +69,6 @@ components/
 public/
 ```
 
-## Melhorias futuras
-
-- Integração com Stripe
-- Remoção automática de marca d’água para usuários premium
-- Sistema de autenticação
-- Histórico de orçamentos
-- Exportação com modelos diferentes
-- Inserção de anúncios para monetização da versão gratuita
-
-## Status do projeto
-
-Em desenvolvimento.
-
 ## Autor
 
 Rafael Elisei
-Desenvolvedor de Software
