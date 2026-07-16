@@ -1,6 +1,6 @@
 # OrçamentoPro
 
-Gerador de orçamentos em PDF, simples e rápido, pensado para prestadores de serviço, autônomos e pequenos negócios.
+Gerador de orçamentos em PDF, simples e rápido, pensado para usuários finais, prestadores de serviço, autônomos e pequenos negócios.
 
 ## Sobre o projeto
 
