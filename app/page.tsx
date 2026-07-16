@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import {
   Briefcase,
   User,
@@ -160,6 +161,14 @@ export default function Home() {
   const [lastSessionId, setLastSessionId] = useState("");
   const [copied, setCopied] = useState(false);
   const [checkoutEmail, setCheckoutEmail] = useState("");
+  const [tosAccepted, setTosAccepted] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("orcafacil_policy_accepted") === "true";
+  });
+  const [privacyAccepted, setPrivacyAccepted] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("orcafacil_policy_accepted") === "true";
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const verifySession = useCallback(async (sid: string) => {
@@ -244,6 +253,7 @@ export default function Home() {
   }
 
   function handlePremiumCheckout() {
+    localStorage.setItem("orcafacil_policy_accepted", "true");
     setLoadingPremium(true);
     fetch("/api/create-checkout-session", {
       method: "POST",
@@ -614,7 +624,7 @@ export default function Home() {
                     </div>
                     <button
                       onClick={handlePremiumCheckout}
-                      disabled={!isValidEmail(checkoutEmail) || loadingPremium}
+                      disabled={!isValidEmail(checkoutEmail) || !tosAccepted || !privacyAccepted || loadingPremium}
                       className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white text-sm font-bold uppercase tracking-wider shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 shrink-0 flex items-center gap-2"
                     >
                       {loadingPremium ? (
@@ -623,6 +633,44 @@ export default function Home() {
                         <><Crown size={16} /> Assinar</>
                       )}
                     </button>
+                  </div>
+                  <div className="flex flex-col gap-2 mt-2">
+                    <label className="flex items-center gap-2.5 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={tosAccepted}
+                        onChange={(e) => setTosAccepted(e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-300 text-[#0058be] focus:ring-[#0058be] accent-[#0058be]"
+                      />
+                      <span className="text-xs text-gray-600 group-hover:text-gray-800 transition-colors">
+                        Aceito os{" "}
+                        <Link
+                          href="/termos-de-uso"
+                          target="_blank"
+                          className="text-[#0058be] underline hover:text-blue-700 font-medium"
+                        >
+                          Termos de Serviço
+                        </Link>
+                      </span>
+                    </label>
+                    <label className="flex items-center gap-2.5 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={privacyAccepted}
+                        onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-300 text-[#0058be] focus:ring-[#0058be] accent-[#0058be]"
+                      />
+                      <span className="text-xs text-gray-600 group-hover:text-gray-800 transition-colors">
+                        Aceito a{" "}
+                        <Link
+                          href="/politica-de-privacidade"
+                          target="_blank"
+                          className="text-[#0058be] underline hover:text-blue-700 font-medium"
+                        >
+                          Política de Privacidade
+                        </Link>
+                      </span>
+                    </label>
                   </div>
                 </div>
                 <details className="group">
