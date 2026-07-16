@@ -54,6 +54,10 @@ const defaultCliente = {
 
 const defaultServicos: Servico[] = [emptyServico()];
 
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function maskPhone(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 11);
   if (digits.length <= 2) return `(${digits}`;
@@ -156,7 +160,6 @@ export default function Home() {
   const [lastSessionId, setLastSessionId] = useState("");
   const [copied, setCopied] = useState(false);
   const [checkoutEmail, setCheckoutEmail] = useState("");
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const verifySession = useCallback(async (sid: string) => {
@@ -241,10 +244,6 @@ export default function Home() {
   }
 
   function handlePremiumCheckout() {
-    if (!checkoutEmail) {
-      setShowCheckoutForm(true);
-      return;
-    }
     setLoadingPremium(true);
     fetch("/api/create-checkout-session", {
       method: "POST",
@@ -552,26 +551,8 @@ export default function Home() {
                 {lastSessionId && (
                   <div className="bg-[#f0fdf4] rounded-xl px-4 py-3 border border-[#bbf7d0]">
                     <p className="text-[11px] font-bold text-[#15803d] mb-1">Pagamento confirmado!</p>
-                    <p className="text-[10px] text-[#166534] mb-2">
-                      Guarde este código para restaurar seu acesso se necessário:
-                    </p>
-                    <div className="flex gap-2">
-                      <code className="flex-1 text-[10px] bg-white rounded-lg px-3 py-2 border border-[#bbf7d0] font-mono text-[#111827] break-all select-all">
-                        {lastSessionId}
-                      </code>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(lastSessionId);
-                          setCopied(true);
-                          setTimeout(() => setCopied(false), 2000);
-                        }}
-                        className="h-9 px-3 rounded-lg bg-[#15803d] text-white text-[10px] font-bold hover:bg-[#166534] transition-all active:scale-95 shrink-0"
-                      >
-                        {copied ? "Copiado!" : "Copiar"}
-                      </button>
-                    </div>
-                    <p className="text-[10px] text-[#166534] mt-2">
-                      Esse código também foi enviado no email de confirmação do Stripe.
+                    <p className="text-[10px] text-[#166534]">
+                      Seu acesso vitalício está ativo. Você pode refazer o download do PDF sem marca d'água quantas vezes quiser.
                     </p>
                   </div>
                 )}
@@ -616,39 +597,37 @@ export default function Home() {
                 <p className="text-xs text-[#6b7280] leading-relaxed">
                   Remova a marca d'água dos PDFs e adicione o logo da sua empresa por apenas <strong className="text-[#111827]">R$ 9,90</strong> (pagamento único vitalício).
                 </p>
-
-                {showCheckoutForm && !checkoutEmail && (
-                  <div className="flex flex-col gap-2">
-                    <Label>Seu email para recuperar o acesso</Label>
-                    <div className="flex gap-2">
+                <div className="flex flex-col gap-2">
+                  <Label>Email</Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
                       <Input
                         placeholder="seu@email.com"
+                        type="email"
                         value={checkoutEmail}
                         onChange={(e) => setCheckoutEmail(e.target.value)}
+                        className={checkoutEmail && !isValidEmail(checkoutEmail) ? "border-red-400 focus:ring-red-300 focus:border-red-400" : ""}
                       />
-                      <button
-                        onClick={handlePremiumCheckout}
-                        disabled={!checkoutEmail || loadingPremium}
-                        className="h-12 px-5 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all disabled:opacity-50 active:scale-95 shrink-0"
-                      >
-                        {loadingPremium ? "..." : "Ir pagar"}
-                      </button>
+                      {checkoutEmail && !isValidEmail(checkoutEmail) && (
+                        <p className="text-[10px] text-red-500 mt-1 ml-1">Email inválido</p>
+                      )}
                     </div>
+                    <button
+                      onClick={handlePremiumCheckout}
+                      disabled={!isValidEmail(checkoutEmail) || loadingPremium}
+                      className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white text-sm font-bold uppercase tracking-wider shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 shrink-0 flex items-center gap-2"
+                    >
+                      {loadingPremium ? (
+                        <span>Carregando...</span>
+                      ) : (
+                        <><Crown size={16} /> Assinar</>
+                      )}
+                    </button>
                   </div>
-                )}
-
-                {!showCheckoutForm && (
-                  <button
-                    onClick={() => setShowCheckoutForm(true)}
-                    className="w-full h-12 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white text-sm font-bold uppercase tracking-wider shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
-                  >
-                    <Crown size={16} /> Assinar Premium — R$ 9,90
-                  </button>
-                )}
-
+                </div>
                 <details className="group">
                   <summary className="text-[11px] text-[#9ca3af] cursor-pointer hover:text-[#6b7280] transition-colors select-none">
-                    Já é premium? Restaurar acesso
+                    Já pagou? Restaurar acesso
                   </summary>
                   <div className="flex gap-2 mt-3">
                     <div className="flex-1 flex flex-col gap-1.5">
